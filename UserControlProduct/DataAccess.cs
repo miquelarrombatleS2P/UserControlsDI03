@@ -13,7 +13,7 @@ namespace UserControlProduct
 {
     class DataAccess
     {
-        public static ProductPhoto GetProductWithImage(int productModelID)
+        public static ProductPhoto GetProductWithImage(int productID)
         {
             string connectionString = "Server = tcp:spdvi2020.database.windows.net,1433; Initial Catalog = AdventureWorks2016; Persist Security Info = False; User ID = spdvi; Password = Miquel1997; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Connection Timeout = 30; ";
 
@@ -23,7 +23,7 @@ namespace UserControlProduct
                                 FROM Production.Product 
                                 INNER JOIN Production.ProductProductPhoto ON Product.ProductID = ProductProductPhoto.ProductID 
                                 INNER JOIN Production.ProductPhoto ON ProductProductPhoto.ProductPhotoID = ProductPhoto.ProductPhotoID 
-                                WHERE Product.ProductModelID = {productModelID} AND Product.Color is not null; ";
+                                WHERE Product.ProductModelID = {productID} AND Product.Color is not null; ";
 
                 ProductPhoto productPhoto = connection.Query<ProductPhoto>(sql).FirstOrDefault();
                 
@@ -47,22 +47,22 @@ namespace UserControlProduct
                        + $"INNER JOIN Production.ProductModel on Production.Product.ProductModelID = Production.ProductModel.ProductModelID "
                        + $"INNER JOIN Production.ProductModelProductDescriptionCulture on Production.ProductModel.ProductModelID = Production.ProductModelProductDescriptionCulture.ProductModelID "
                        + $"INNER JOIN Production.ProductDescription on Production.ProductModelProductDescriptionCulture.ProductDescriptionID = Production.ProductDescription.ProductDescriptionID "
-                       + $"WHERE ProductModelProductDescriptionCulture.CultureID = 'en' AND Product.ProductModelID IS NOT NULL "
-                       + $"AND Product.ProductModelID = '{productModelID}';";
+                       + $"WHERE ProductModelProductDescriptionCulture.CultureID = 'en' AND Production.Product.ProductModelID IS NOT NULL "
+                       + $"AND Production.Product.ProductModelID = {productModelID};";
 
                 List<Product> products = connection.Query<Product>(sql).ToList();
                 return products;
             }
         }
 
-        public static List<Product> GetProductSizeWithColor(string size, string color)
+        public static List<Product> GetProductSizeWithColor(string size, string color, int productModelId)
         {
             string connectionString = "Server = tcp:spdvi2020.database.windows.net,1433; Initial Catalog = AdventureWorks2016; Persist Security Info = False; User ID = spdvi; Password = Miquel1997; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Connection Timeout = 30; ";
 
             using (IDbConnection connection = new SqlConnection(connectionString))
             {
                 string sql = $"SELECT "
-                       + $"Production.Product.ProductID AS ProductID, Production.Product.ProductModelID AS ProductModelID, Production.ProductModel.Name, "
+                       + $"Production.Product.ProductID AS ProductID, Production.Product.ProductModelID AS ProductModelID, Production.Product.Name, "
                        + $"Production.ProductDescription.Description, Production.Product.ListPrice, Production.Product.Size, Production.Product.Color "
                        + $"FROM "
                        + $"Production.Product "
@@ -71,7 +71,7 @@ namespace UserControlProduct
                        + $"INNER JOIN Production.ProductModel on Production.Product.ProductModelID = Production.ProductModel.ProductModelID "
                        + $"INNER JOIN Production.ProductModelProductDescriptionCulture on Production.ProductModel.ProductModelID = Production.ProductModelProductDescriptionCulture.ProductModelID "
                        + $"INNER JOIN Production.ProductDescription on Production.ProductModelProductDescriptionCulture.ProductDescriptionID = Production.ProductDescription.ProductDescriptionID "
-                       + $"WHERE ProductModelProductDescriptionCulture.CultureID = 'en' AND Product.ProductModelID IS NOT NULL "
+                       + $"WHERE ProductModelProductDescriptionCulture.CultureID = 'en' AND Production.Product.ProductModelID = {productModelId} "
                        + $"AND Product.Size = '{size}' AND Product.Color = '{color}';";
 
                 List<Product> products = connection.Query<Product>(sql).ToList();

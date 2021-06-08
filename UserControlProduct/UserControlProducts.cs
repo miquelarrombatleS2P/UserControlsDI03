@@ -25,6 +25,10 @@ namespace UserControlProduct
             get { return _ProductModelID; }
             set
             {
+                if (_ProductModelID == 0)
+                {
+                    _ProductModelID = 1;
+                }
                 _ProductModelID = value;
                 //MessageBox.Show(_ProductModelID.ToString());
                 UpdateInfo(_ProductModelID);
@@ -32,13 +36,14 @@ namespace UserControlProduct
         }
         public void UpdateInfo(int productModelID)
         {
-            sizeFlowLayoutPanel.Controls.Clear();
-            colorFlowLayoutPanel.Controls.Clear();
             if (productModelID == 0)
             {
                 productModelID = 1;
             }
-            
+
+            sizeFlowLayoutPanel.Controls.Clear();
+            colorFlowLayoutPanel.Controls.Clear();
+                
             ProductPhoto productPhoto = DataAccess.GetProductWithImage(productModelID);
             //  MessageBox.Show(productPhoto.ToString());
            
@@ -144,21 +149,27 @@ namespace UserControlProduct
 
         public void searchProduct()
         {
-            List<Product> productReset = DataAccess.GetProductSizeWithColor(product.Size, product.Color);
-            int idProduct = 1;
+            List<Product> productReset = DataAccess.GetProductSizeWithColor(product.Size, product.Color, _ProductModelID);
+            int productID = 1;
             foreach (Product product in productReset)
             {
-                idProduct = int.Parse(product.productID.ToString());
+                productID = int.Parse(product.productID);
                 IdTextBox1.Text = product.productID.ToString();
-                
+                nameTextBox.Text = product.Name;
+
             }
 
-            ProductPhoto productPhoto = DataAccess.GetProductWithImageSelectedSizeAndColor(idProduct);
+            ProductPhoto productPhoto = DataAccess.GetProductWithImageSelectedSizeAndColor(productID);
             byte[] photo = productPhoto.LargePhoto;
             MemoryStream ms = new MemoryStream(photo);
             Image image = Image.FromStream(ms);
             productPictureBox.Image = image;
-            nameTextBox.Text = productPhoto.Name;
+            
+        }
+
+        private void nameTextBox_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
